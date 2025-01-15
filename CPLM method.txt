@@ -1,0 +1,46 @@
+appendix D:
+
+ #CPLM method
+ da <- subset(AutoClaim, IN_YY == 1) # use data in the Yip and Yau paper
+ da <- transform(da, CLM_AMT5 = CLM_AMT5/1000,INCOME = INCOME/10000)
+ summary(da$CLM_AMT5)
+ sum(da$CLM_AMT5 == 0)/nrow(da)
+
+ P1 <- cpglm(CLM_AMT5 ~AGE+BLUEBOOK+ HOMEKIDS
+ + MARRIED +KIDSDRIV+MVR_PTS+NPOLICY
+ +TRAVTIME+ AREA+CAR_USE+CAR_TYPE+GENDER+
+ JOBCLASS+MAX_EDUC+MARRIED+REVOLKED,data = da)
+ summary(P1)
+ coef(P1)
+ c(coef(P1), p = P1$p, phi = P1$phi)
+ print(P1)
+
+#Gini
+ # Let’s fit a series of models and compare them using the Gini index
+ da <- subset(AutoClaim, IN_YY == 1)
+ da <- transform(da, CLM_AMT = CLM_AMT / 1000)
+
+ P1 <- cpglm(CLM_AMT ~ 1, data = da, offset = log(NPOLICY))
+
+ P2 <- cpglm(CLM_AMT ~ factor(CAR_USE) + factor(REVOLKED) +
+ factor(GENDER) + factor(AREA) +
+ factor(MARRIED) + factor(CAR_TYPE),
+ data = da, offset = log(NPOLICY))
+ 
+P3 <- cpglm(CLM_AMT ~ factor(CAR_USE) + factor(REVOLKED) +
+ factor(GENDER) + factor(AREA) +
+ factor(MARRIED) + factor(CAR_TYPE) +
+ TRAVTIME + MVR_PTS + INCOME,
+ data = da, offset = log(NPOLICY))
+ da <- transform(da, P1 = fitted(P1), P2 = fitted(P2), P3 = fitted(P3))
+ # compute the Gini indices
+ gg <- gini(loss = "CLM_AMT", score = paste("P", 1:3, sep = ""),
+ data = da)
+ gg
+
+ # plot the Lorenz curves
+ theme_set(theme_bw())
+ plot(gg)
+ plot(gg, overlay = FALSE)
+
+ ## End(Not run)

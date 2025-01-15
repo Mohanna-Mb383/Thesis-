@@ -1,0 +1,25 @@
+ appendix B:
+
+ Regression Tree:
+ # Regression Tree
+ library(rpart)
+ # grow tree
+ fit <- rpart(CLM_AMT5 ~ AGE+BLUEBOOK+ HOMEKIDS+
+ MARRIED + AREA +
+ MVR_PTS+NPOLICY+RETAINED+TRAVTIME+AREA+CAR_USE
+ +CAR_TYPE+GENDER+JOBCLASS+MAX_EDUC+REVOLKED,
+ method="anova", data=AutoClaim)
+
+ printcp(fit) # display the results
+ plotcp(fit) # visualize cross-validation results
+ summary(fit) # detailed summary of splits
+
+ # create additional plots
+ par(mfrow=c(1,2)) # two plots on one page
+ rsq.rpart(fit) # visualize cross-validation results
+
+
+ # plot tree
+ plot(fit, uniform=TRUE,
+main="Regression Tree ")
+ text(fit, use.n=TRUE, all=TRUE, cex=.8)
